@@ -1,0 +1,34 @@
+// TEST DYNAMIC LANGUAGE
+// FILE: point.tdl
+type Point(x, y);
+function sqr(x) {
+    return x * x;
+};
+function sqrt(x);
+function distance(p1, p2) {
+    p1 as Point;
+    p2 as Point;
+    return sqrt(sqr(p2.x - p1.x) + sqr(p2.y - p1.y));
+};
+invoke on Point {
+    return sqrt(x * x + y * y); // x & y are fields of Point
+};
+max = 100;
+function print(s);
+function foo(p, s) {
+    ss = s as String;  // This variable is unused
+    pp1 = p as Point;  // Compiler knows type(pp1)=Point
+    absErr = p();      // Unresolved error, compiler does not know type(p)
+    abs1 = pp1();      // invoke on Point
+    if (abs1 > max) {
+        print("Intermediate: ");
+        print(s);
+    };
+    ppErr = Point();   // Unmatching arguments
+    pp2 = Point(1, 2); // Compiler knows type(pp2)=Point
+    abs2 = pp2();      // invoke on Point
+    if (abs2 > max) {
+        print("Final: ");
+        print(pp2);
+    };
+};

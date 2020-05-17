@@ -8,7 +8,7 @@ class TextWithBracketBlocks(
 ) {
 
     companion object {
-        fun createBlock(text: String, mapOfIndex: Map<Int, Int>, startIndex: Int): TextWithBracketBlocks {
+        fun createBlock(text: String, mapOfIndex: Map<Int, Int>, startIndex: Int, separators: Pair<Char, Char>): TextWithBracketBlocks {
             val indicesOfThisBlock = mutableMapOf<Int, Int>()
             val listOfBlocks = mutableListOf<TextWithBracketBlocks>()
             val listOfText = mutableListOf<String>()
@@ -21,15 +21,25 @@ class TextWithBracketBlocks(
                 indicesOfThisBlock[i] = mapOfIndex[i]!!
                 i = mapOfIndex[i]!! + 1
             }
-            for ((key, value) in indicesOfThisBlock.toSortedMap()) {
+            val sortedMapOfInd = indicesOfThisBlock.map { it.key to it.value }.sortedBy { it.first }
+            for ((key, value) in sortedMapOfInd) {
                 val textInBrackets = text.substring(key + 1 - startIndex, value - startIndex)
                 listOfText.add(textInBrackets)
-                listOfBlocks.add(createBlock(textInBrackets, mapOfIndex.filter { it.key in key + 1 until value }, key + 1))
+                listOfBlocks.add(createBlock(
+                        textInBrackets, mapOfIndex.filter { it.key in key + 1 until value }, key + 1, separators
+                ))
             }
+            var j = text.indexOf(separators.first) + 1
             var finalText = text
             for (elem in listOfText) {
-                finalText = finalText.replace(elem, "")
+                j = finalText.indexOf(elem, j)
+                val openIndex = j
+                j += elem.length
+                j = finalText.indexOf(separators.second, j)
+                finalText = finalText.substring(0, openIndex) + finalText.substring(j, finalText.length)
+                j = openIndex + 1
             }
+            println(finalText)
             return TextWithBracketBlocks(finalText, listOfBlocks, indicesOfThisBlock, startIndex, text)
         }
     }
@@ -60,13 +70,13 @@ class TextWithBracketBlocks(
         return TextWithBracketBlocks(string, subBlocks, indicesOfThisBlock, startInd, string)
     }
 
-    private fun findSeparatorIndices(bracket: Char, vararg separatorChar: Char): List<Int> {
+    private fun findSeparatorIndices(bracket: Char, vararg separatorChars: Char): List<Int> {
         val res = mutableListOf(startIndex - 1)
         var index = startIndex
         for (char in mainText) {
             when {
                 char == bracket -> index = mapOfIndex[index]!! - 1
-                separatorChar.contains(char) -> res.add(index)
+                separatorChars.contains(char) -> res.add(index)
             }
             index++
         }

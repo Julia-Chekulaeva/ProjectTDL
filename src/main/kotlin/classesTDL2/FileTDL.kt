@@ -48,7 +48,8 @@ class FileTDL(val file: File) {
     fun readFile(): List<LexemBlock> {
         val wholeText = strings.joinToString(" ")
         val mapOfBraketsWithText = countOfBrackets(wholeText, file, '{' to '}', 0)
-        val block = TextWithBracketBlocks.createBlock(mapOfBraketsWithText.second, mapOfBraketsWithText.first, 0)
+        val block = TextWithBracketBlocks.createBlock(mapOfBraketsWithText.second, mapOfBraketsWithText.first, 0, '{' to '}')
+        println(block.createLexemBlocks('{' to '}', ';', file).joinToString { "${it.text} #${it.blocks.joinToString { it.text }}*" })
         return block.createLexemBlocks('{' to '}', ';', file)
     }
 

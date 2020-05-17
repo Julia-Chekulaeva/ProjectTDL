@@ -70,6 +70,10 @@ data class ExpressionTDL(val str: String, val file: File, val index: Int) {
                             type = typeTDL
                         }
                     }
+                    programNames.allFunctions.map { it.key.first to it.value }.
+                    toMap()[nameAndCountOfArgs.first] != null ->
+                        mapOfErrors[file]!!.addError(nameWithBrackets!!.second, "unmatching arguments")
+                    else -> mapOfErrors[file]!!.addError(nameWithBrackets!!.second, "unresolved")
                 }
             }
             typeName != null -> {
@@ -97,7 +101,7 @@ data class ExpressionTDL(val str: String, val file: File, val index: Int) {
 
     private fun creatingExprBlocks() {
         val mapOfBrackets = countOfBrackets(str, file, '(' to ')', index)
-        exprBlocks = TextWithBracketBlocks.createBlock(mapOfBrackets.second, mapOfBrackets.first, index)
+        exprBlocks = TextWithBracketBlocks.createBlock(mapOfBrackets.second, mapOfBrackets.first, index, '(' to ')')
     }
 
     private fun creatingSplitExpressions() {

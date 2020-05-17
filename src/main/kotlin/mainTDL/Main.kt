@@ -33,7 +33,7 @@ fun countOfBrackets(string: String, file: File?, bracket: Pair<Char, Char>, star
 }
 
 fun main(args: Array<String>) {
-    val file = File("src/main/resources/examples/point2.tdl")
+    val file = File("src/main/resources/examples/triangle.tdl")
     val parser = FilesParser()
     val list = parser.readingFiles(file)
     for (str in list) {

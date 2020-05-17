@@ -2,6 +2,8 @@ package classesTDL2
 
 class VariableTDL(val name: String, val exp: ExpressionTDL) {
 
+    fun otherVar() = exp.variable
+
     var type: TypeTDL? = null
 
     var used = false

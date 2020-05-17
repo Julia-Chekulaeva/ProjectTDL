@@ -31,16 +31,18 @@ class FilesParser {
             listOfProgramNames[i].addingOtherProgramNames(filesToAdd)
         }
         for (file in list) {
-            mapOfFilesAndProgramNames[file]!!.addImportsToThis()
-            mapOfFilesAndProgramNames[file]!!.invokesOn()
-            mapOfFilesAndProgramNames[file]!!.analysingVars()
-            mapOfFilesAndProgramNames[file]!!.analysingFunsAndInvokes()
-            mapOfFilesAndProgramNames[file]!!.separatingImportsFromThis()
+            val programNames = mapOfFilesAndProgramNames[file]!!
+            programNames.addImportsToThis()
+            programNames.invokesOn()
+            programNames.analysingVars()
+            programNames.analysingFunsAndInvokes()
+            programNames.separatingImportsFromThis()
             res.add("File ${file.absolutePath}")
             res.add("Imported files:")
-            res.addAll(mapOfFilesAndProgramNames[file]!!.importedFiles.map { "\t${it.absolutePath}" })
+            res.addAll(programNames.importedFiles.map { "\t${it.absolutePath}" })
+            res.addAll(programNames.getAllNames())
             res.addAll(mapOfErrors[file]!!.getErrorsMessages())
-            res.addAll(mapOfFilesAndProgramNames[file]!!.getUnused())
+            res.addAll(programNames.getUnused())
         }
         return res
     }

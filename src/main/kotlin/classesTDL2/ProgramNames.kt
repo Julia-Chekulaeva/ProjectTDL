@@ -40,6 +40,16 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
 
     val vars = mutableMapOf<String, VariableTDL>()
 
+    fun getAllNames(): List<String> {
+        val res = mutableListOf<String>()
+        res.add("Types: ${types.filter { it.key != "String" && it.key != "Integer" }
+                .values.joinToString { "${it.name}(${it.fields.keys.joinToString(", ")})" }}")
+        res.add("Functions: ${functions.values.joinToString { "${it.name}(${it.args.keys.joinToString(", ")})" }}")
+        res.add("Variables: ${vars.values.joinToString { it.name }}")
+        res.add("Invokes on: ${types.filter { it.value.hasInvoke }.map { it.key }.joinToString(", ")}")
+        return res.toList()
+    }
+
     fun getUnused(): List<String> {
         val unusedTypes = types.filter { !it.value.used && it.key != "String" && it.key != "Integer" }.map { it1 ->
             it1.key to it1.value.fields.map { it.key }
@@ -48,7 +58,7 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
             it1.key to it1.value.fields.filter { !it.value }.map { it.key }
         }
         val unusedFuns = functions.filter { !it.value.used && it.key != "main" to 0 }.map { it1 ->
-            it1.key.first to it1.value.args.filter { !it.value.first }.map { it.key }
+            it1.key.first to it1.value.args.map { it.key }
         }
         val funsWithUnusedFieldsAndVars = functions.map { it1 ->
             it1.key.first to (
@@ -129,7 +139,7 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
 
     fun analysingFunsAndInvokes() {
         for (function in functions.values)
-            function.analysingFun(file, this)
+            function.analysingFun(file, this, null)
         for (type in types.values.filter { it.hasInvoke })
             type.runInvoke(file, this)
     }
@@ -228,6 +238,22 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
             allVarsWithFields.addAll(pair.first)
             allVarsWithInvoke.addAll(pair.second)
         }
+        for (variable in vars.values) {
+            var similaryTypedVariable: VariableTDL? = variable
+            val problemVars = mutableListOf<String>()
+            while (similaryTypedVariable != null && similaryTypedVariable.otherVar() != null && similaryTypedVariable.type == null) {
+                problemVars.add(similaryTypedVariable.name)
+                similaryTypedVariable = vars[similaryTypedVariable.otherVar()!!.first]
+            }
+            similaryTypedVariable = if (problemVars.size == 0) null
+            else imports.importedVars[problemVars.last()]
+            while (similaryTypedVariable != null && similaryTypedVariable.otherVar() != null && similaryTypedVariable.type == null) {
+                similaryTypedVariable = imports.importedVars[similaryTypedVariable.otherVar()!!.first]
+            }
+            val type = similaryTypedVariable?.type
+            for (variableTDL in problemVars)
+                vars[variableTDL]!!.type = type
+        }
         analysingFieldsAndInvokes(allVarsWithFields, allVarsWithInvoke, mutableMapOf(), mutableMapOf())
     }
 
@@ -255,8 +281,8 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
     }
 
     private fun correctFunctions() {
-        for (type in errorFunctions)
-            functions.remove(type)
+        for (function in errorFunctions)
+            functions.remove(function)
     }
 
     private fun correctInvokes() {

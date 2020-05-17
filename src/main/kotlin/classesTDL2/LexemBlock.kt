@@ -7,13 +7,27 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
     fun analysingImports(file: File, programNames: ProgramNames): Boolean {
         val textWithoutSpaces = text.filter { it != ' ' }
         if (text.matches(""" *import +file +[\w.\d]+ *""".toRegex())) {
-            val fileName = "${textWithoutSpaces.removePrefix("importfile")}.tdl"
+            val name = textWithoutSpaces.removePrefix("importfile").replace(".", File.separator)
+            var fileName = "$name.tdl"
+            var directory = file.parentFile
+            if (!File(fileName).exists()) {
+                while (directory != null) {
+                    if (directory.listFiles().any {
+                                it.absolutePath.removePrefix(directory.absolutePath) == "${File.separator}$fileName"
+                            }) {
+                        fileName = directory.absolutePath + "${File.separator}$fileName"
+                        break
+                    }
+                    directory = directory.parentFile
+                }
+            }
             val fileToImport = File(fileName)
-            if (fileToImport.isFile) {
+            if (fileToImport.exists()) {
                 programNames.addFile(fileToImport)
                 return true
             }
-            mapOfErrors[file]!!.addError(text.indexOf(fileName, text.indexOf(" file ") + 5) + startIndex, "unresolved")
+            mapOfErrors[file]!!.addError(text.indexOf(fileName,
+                    text.indexOf(" file ") + 5) + startIndex, "unresolved")
             return true
         }
         return false
@@ -56,7 +70,7 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
         if (text.matches(""" *function +[\w\d]+ *\(( *[\w\d]+( *, *[\w\d]+)*)? *\) *(\{} *)?""".toRegex())) {
             val split = textWithoutSpaces.removePrefix("function").removeSuffix("{}").removeSuffix(")").split("(")
             val name = split[0]
-            val params = if (split.size == 2)
+            val params = if (split.size == 2 && split[1].trim().isNotEmpty())
                 split[1].split(",")
             else listOf()
             var beginningOfArgs = text.indexOf("(")
@@ -138,21 +152,25 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
                 if (localVars[param] == null && programNames.vars[param] == null)
                     mapOfErrors[file]!!.addError(startIndex + text.indexOf(param), "unresolved")
                 else
-                    mapOfErrors[file]!!.addError(startIndex + text.indexOf(param), "variable type cannot be reassigned")
+                    mapOfErrors[file]!!.addError(startIndex + text.indexOf(param),
+                            "variable type cannot be reassigned")
                 return
             }
-            if (programNames.types[type] == null) {
-                mapOfErrors[file]!!.addError(startIndex + text.indexOf(param, text.indexOf(" as ")), "unresolved")
+            if (programNames.allTypes[type] == null) {
+                mapOfErrors[file]!!.addError(
+                        startIndex + text.indexOf(type, text.indexOf(" as ") + 4), "unresolved"
+                )
                 return
             }
-            args[param] = args[param]!!.first to programNames.types[type]
-            programNames.types[type]!!.used = true
+            args[param] = args[param]!!.first to programNames.allTypes[type]
+            programNames.allTypes[type]!!.used = true
             return
         }
         if (text.matches(""" *\w[\w\d]* *\(.*\) *""".toRegex())) {
             val expr = ExpressionTDL(text, file, startIndex)
             expr.parsingExpr()
-            expr.analysingExpr(programNames, localVars, args)
+            val pair = expr.analysingExpr(programNames, localVars, args)
+            programNames.analysingFieldsAndInvokes(pair.first, pair.second, localVars, args)
             return
         }
         if (text.matches(""" *[\w\d]* *=.*""".toRegex())) {

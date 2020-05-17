@@ -19,7 +19,7 @@ class TypeTDL(val name: String, val fields: MutableMap<String, Boolean>) {
         for (fieldName in fields.keys)
             args[fieldName] = false to null
         val function = FunctionTDL(name, args, invokeBody)
-        function.analysingFun(file, programNames)
+        function.analysingFun(file, programNames, this)
         localFunInvoke = function
         val args2 = localFunInvoke!!.args
         for ((argName, usedAndType) in args2)

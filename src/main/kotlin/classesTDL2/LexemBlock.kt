@@ -208,7 +208,6 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
             val expr = split[1]
             localVars[name] = VariableTDL(name, ExpressionTDL(expr, file, text.indexOf(expr, text.indexOf("=")) + startIndex))
             val pair = localVars[name]!!.setType(programNames, localVars, args)
-            println("$pair    ${file.name}")
             programNames.analysingFieldsAndInvokes(pair.first, pair.second, localVars, args)
             return
         }

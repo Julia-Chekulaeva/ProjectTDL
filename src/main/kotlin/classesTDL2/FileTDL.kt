@@ -1,6 +1,6 @@
 package classesTDL2
 
-import mainTDL.countOfBrackets
+import testsTDL.countOfBrackets
 import java.io.File
 
 const val CHAR_FOR_STRINGS = '_'

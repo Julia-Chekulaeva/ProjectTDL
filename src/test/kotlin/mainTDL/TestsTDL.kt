@@ -1,6 +1,0 @@
-package mainTDL
-
-class TestsTDL {
-
-
-}

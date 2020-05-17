@@ -1,0 +1,32 @@
+// FILE: triangle.tdl
+import file point;
+type Triangle(p1, p2, p3);
+
+function perimeter(t) {
+    t as Triangle;
+    return distance(t.p1, t.p2) +
+           distance(t.p2, t.p3) + distance(t.p3, t.p1);
+};
+
+invoke on Triangle {
+    // This 'invoke on' is unused
+    p = perimeter(this) / 2; // this is Triangle
+    p12 = distance(p1, p2);  // p1, p2 & p3 are fields of Triangle
+    p23 = distance(p2, p3);
+    p31 = distance(p3, p1);
+    return sqrt(p * (p - p12) * (p - p23) * (p - p31));
+};
+
+function triangle() {
+    return Triangle(Point(0, 0), Point(3, 0), Point(0, 4));
+};
+
+function bar(triangle) {
+    // parameter 'triangle' is unused
+    result = triangle(); // this is function call, not invoke on call
+};
+
+function main() {
+    bar(Triangle(3, 4, 5));
+    foo("Hello", Point(2, 4));
+};

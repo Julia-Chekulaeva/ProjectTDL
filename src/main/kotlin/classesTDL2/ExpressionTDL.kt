@@ -1,6 +1,6 @@
 package classesTDL2
 
-import mainTDL.countOfBrackets
+import testsTDL.countOfBrackets
 import java.io.File
 
 data class ExpressionTDL(val str: String, val file: File, val index: Int) {

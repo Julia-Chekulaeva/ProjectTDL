@@ -1,0 +1,81 @@
+Analysing files
+File C:\Users\Юлия\IdeaProjects\ProjectTDL\src\test\resources\examples\point.tdl
+Imported files:
+Types: Point(x, y)
+Functions: sqr(x), sqrt(x), distance(p1, p2), print(s), foo(p, s)
+Variables: max
+Invokes on: Point
+Errors found: 2
+	Error in string 21 char 14: unresolved
+	Error in string 27 char 13: unmatching arguments
+Unused
+	types:
+	type fields:
+		Integer:
+		Point:
+	functions:
+	    distance(p1, p2)
+    	foo(p, s)
+	invokes:
+	functions arguments and local variables:
+		sqr:
+			arguments:
+			local variables:
+		sqrt:
+			arguments:
+			local variables:
+		distance:
+			arguments:
+			local variables:
+		print:
+			arguments:
+			local variables:
+		foo:
+			arguments:
+			local variables:
+				ss
+				absErr
+				ppErr
+	invokes local variables:
+		Point:
+	global variables:
+File C:\Users\Юлия\IdeaProjects\ProjectTDL\src\test\resources\examples\point2.tdl
+Imported files:
+Types: Point(x, y)
+Functions: sqr(x), sqrt(x), distance(p1, p2), print(s), foo(p, s)
+Variables: max, o
+Invokes on: Point
+Errors found: 2
+	Error in string 22 char 14: unresolved
+	Error in string 28 char 13: unmatching arguments
+Unused
+	types:
+	type fields:
+		Integer:
+		Point:
+	functions:
+		distance(p1, p2)
+		foo(p, s)
+	invokes:
+	functions arguments and local variables:
+		sqr:
+			arguments:
+			local variables:
+		sqrt:
+			arguments:
+			local variables:
+		distance:
+			arguments:
+			local variables:
+		print:
+			arguments:
+			local variables:
+		foo:
+			arguments:
+			local variables:
+				ss
+				absErr
+				ppErr
+	invokes local variables:
+		Point:
+	global variables:

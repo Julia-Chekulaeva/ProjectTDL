@@ -178,13 +178,6 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
             programNames.allTypes[type]!!.used = true
             return
         }
-        if (text.matches(""" *\w[\w\d]* *\(.*\) *""".toRegex())) {
-            val expr = ExpressionTDL(text, file, startIndex)
-            expr.parsingExpr()
-            val pair = expr.analysingExpr(programNames, localVars, args)
-            programNames.analysingFieldsAndInvokes(pair.first, pair.second, localVars, args)
-            return
-        }
         if (text.matches(""" *[\w\d]* *=.*""".toRegex())) {
             val split = text.split("=")
             val name = split[0].trim()
@@ -219,6 +212,12 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
             programNames.analysingFieldsAndInvokes(pair.first, pair.second, localVars, args)
             return
         }
-        mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(text.trim()), unrecognisedStringBlock)
+        //if (text.matches(""" *\w[\w\d]* *\(.*\) *""".toRegex())) {
+        val expr = ExpressionTDL(text, file, startIndex)
+        expr.parsingExpr()
+        val pair = expr.analysingExpr(programNames, localVars, args)
+        programNames.analysingFieldsAndInvokes(pair.first, pair.second, localVars, args)
+        return
+        //mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(text.trim()), unrecognisedStringBlock)
     }
 }

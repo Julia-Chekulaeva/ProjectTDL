@@ -26,8 +26,8 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
                 programNames.addFile(fileToImport)
                 return true
             }
-            mapOfErrors[file]!!.addError(text.indexOf(fileName,
-                    text.indexOf(" file ") + 5) + startIndex, "unresolved")
+            mapOfErrors[file.absolutePath]!!.addError(text.indexOf(fileName,
+                    text.indexOf(" file ") + 5) + startIndex, unresolved)
             return true
         }
         return false
@@ -39,7 +39,7 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
             val split = textWithoutSpaces.removePrefix("type").removeSuffix(")").split("(")
             val name = split[0]
             if (name[0] in '0'..'9') {
-                mapOfErrors[file]!!.addError(startIndex + text.indexOf(name), "name should start with letter")
+                mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(name), nameShouldStartWithLetter)
                 return
             }
             var beginningOfArgs = text.indexOf("(")
@@ -47,24 +47,28 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
                 val params = split[1].split(",")
                 for ((i, param) in params.withIndex()) {
                     if (param[0] in '0'..'9') {
-                        mapOfErrors[file]!!.addError(startIndex + text.indexOf(param, beginningOfArgs), "name should start with letter")
+                        mapOfErrors[file.absolutePath]!!.addError(
+                                startIndex + text.indexOf(param, beginningOfArgs), nameShouldStartWithLetter
+                        )
                         return
                     }
                     if (params.subList(0, i).contains(param)) {
-                        mapOfErrors[file]!!.addError(startIndex + text.indexOf(param, beginningOfArgs), "ambiguity")
+                        mapOfErrors[file.absolutePath]!!.addError(
+                                startIndex + text.indexOf(param, beginningOfArgs), ambiguity
+                        )
                         return
                     }
                     beginningOfArgs += param.length + 1
                 }
                 if (programNames.types[name] != null) {
-                    mapOfErrors[file]!!.addError(startIndex + text.indexOf(name), "ambiguity")
+                    mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(name), ambiguity)
                     programNames.errorTypes.add(name)
                     return
                 }
                 programNames.addType(name, params)
                 return
             }
-            mapOfErrors[file]!!.addError(startIndex + text.indexOf(name), "empty type")
+            mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(name), emptyType)
             return
         }
         if (text.matches(""" *function +[\w\d]+ *\(( *[\w\d]+( *, *[\w\d]+)*)? *\) *(\{} *)?""".toRegex())) {
@@ -75,23 +79,23 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
             else listOf()
             var beginningOfArgs = text.indexOf("(")
             if (name[0] in '0'..'9') {
-                mapOfErrors[file]!!.addError(startIndex + text.indexOf(name), "name should start with letter")
+                mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(name), nameShouldStartWithLetter)
                 return
             }
             for ((i, param) in params.withIndex()) {
                 if (param[0] in '0'..'9') {
-                    mapOfErrors[file]!!.addError(startIndex + text.indexOf(param, beginningOfArgs), "name should start with letter")
+                    mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(param, beginningOfArgs), nameShouldStartWithLetter)
                     return
                 }
                 if (params.subList(0, i).contains(param)) {
-                    mapOfErrors[file]!!.addError(startIndex + text.indexOf(param, beginningOfArgs), "ambiguity")
+                    mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(param, beginningOfArgs), ambiguity)
                     return
                 }
                 beginningOfArgs += param.length + 1
             }
             val function = programNames.functions[name to params.size]
             if (function != null) {
-                mapOfErrors[file]!!.addError(startIndex + text.indexOf(name), "ambiguity")
+                mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(name), ambiguity)
                 programNames.errorFunctions.add(name to params.size)
                 return
             }
@@ -99,10 +103,18 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
             return
         }
         if (text.matches(""" *invoke +on +[\w\d]+ *(\{} *)?""".toRegex())) {
+            if (!text.contains("{}")) {
+                mapOfErrors[file.absolutePath]!!.addError(
+                        startIndex + text.indexOf(text.trim()), invokeMustHaveABody
+                )
+                return
+            }
             val type = textWithoutSpaces.removeSuffix("{}").removePrefix("invokeon")
             val hasOtherInvoke = programNames.invokes.map { it.first }.contains(type)
             if (hasOtherInvoke) {
-                mapOfErrors[file]!!.addError(startIndex + text.indexOf(type, text.indexOf(" on ")), "ambiguity")
+                mapOfErrors[file.absolutePath]!!.addError(
+                        startIndex + text.indexOf(type, text.indexOf(" on ")), ambiguity
+                )
                 programNames.errorInvokes.add(type)
                 return
             }
@@ -113,11 +125,11 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
             val split = text.split("=")
             val name = split[0].trim()
             if (name[0] in '0'..'9') {
-                mapOfErrors[file]!!.addError(startIndex + text.indexOf(name), "name should start with letter")
+                mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(name), nameShouldStartWithLetter)
                 return
             }
             if (programNames.vars[name] != null) {
-                mapOfErrors[file]!!.addError(startIndex + text.indexOf(name), "ambiguity")
+                mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(name), ambiguity)
                 programNames.errorVars.add(name)
                 return
             }
@@ -125,7 +137,7 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
             programNames.addVar(name, ExpressionTDL(expr, file, text.indexOf(expr, text.indexOf("=")) + startIndex))
             return
         }
-        mapOfErrors[file]!!.addError(startIndex + text.indexOf(text.trim()), "unrecognised string block")
+        mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(text.trim()), unrecognisedStringBlock)
     }
 
     fun analyseLowLevel(
@@ -150,15 +162,15 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
             val type = split[1].trim()
             if (args[param] == null) {
                 if (localVars[param] == null && programNames.vars[param] == null)
-                    mapOfErrors[file]!!.addError(startIndex + text.indexOf(param), "unresolved")
+                    mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(param), unresolved)
                 else
-                    mapOfErrors[file]!!.addError(startIndex + text.indexOf(param),
-                            "variable type cannot be reassigned")
+                    mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(param),
+                            variableTypeCannotBeReassigned)
                 return
             }
             if (programNames.allTypes[type] == null) {
-                mapOfErrors[file]!!.addError(
-                        startIndex + text.indexOf(type, text.indexOf(" as ") + 4), "unresolved"
+                mapOfErrors[file.absolutePath]!!.addError(
+                        startIndex + text.indexOf(type, text.indexOf(" as ") + 4), unresolved
                 )
                 return
             }
@@ -177,21 +189,26 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
             val split = text.split("=")
             val name = split[0].trim()
             if (name[0] in '0'..'9') {
-                mapOfErrors[file]!!.addError(startIndex + text.indexOf(name), "name should start with letter")
+                mapOfErrors[file.absolutePath]!!.addError(
+                        startIndex + text.indexOf(name), nameShouldStartWithLetter
+                )
                 return
             }
             if (!varDeclaration) {
-                mapOfErrors[file]!!.addError(startIndex + text.indexOf(name), "variable declaration not allowed here")
+                mapOfErrors[file.absolutePath]!!.addError(
+                        startIndex + text.indexOf(name), variableDeclarationNotAllowedHere
+                )
                 return
             }
             if (localVars[name] != null) {
-                mapOfErrors[file]!!.addError(startIndex + text.indexOf(name), "ambiguity")
+                mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(name), ambiguity)
                 errorVars.add(name)
                 return
             }
             val expr = split[1]
             localVars[name] = VariableTDL(name, ExpressionTDL(expr, file, text.indexOf(expr, text.indexOf("=")) + startIndex))
             val pair = localVars[name]!!.setType(programNames, localVars, args)
+            println("$pair    ${file.name}")
             programNames.analysingFieldsAndInvokes(pair.first, pair.second, localVars, args)
             return
         }
@@ -203,6 +220,6 @@ class LexemBlock(val text: String, val blocks: List<LexemBlock>, val startIndex:
             programNames.analysingFieldsAndInvokes(pair.first, pair.second, localVars, args)
             return
         }
-        mapOfErrors[file]!!.addError(startIndex + text.indexOf(text.trim()), "unrecognised string block")
+        mapOfErrors[file.absolutePath]!!.addError(startIndex + text.indexOf(text.trim()), unrecognisedStringBlock)
     }
 }

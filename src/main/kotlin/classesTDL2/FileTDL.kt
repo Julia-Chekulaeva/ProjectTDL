@@ -15,8 +15,8 @@ class FileTDL(val file: File) {
         val listOfSeparatingIndices = mutableListOf(-1)
         for (string in strings)
             listOfSeparatingIndices.add(string.length + listOfSeparatingIndices.last() + 1)
-        mapOfErrors[file] = Errors(listOfSeparatingIndices)
-        mapOfErrors[file]!!.addErrors(firstErrors)
+        mapOfErrors[file.absolutePath] = Errors(listOfSeparatingIndices)
+        mapOfErrors[file.absolutePath]!!.addErrors(firstErrors)
     }
 
     private fun replaceStringConstants(strings: List<String>): List<String> {
@@ -49,7 +49,6 @@ class FileTDL(val file: File) {
         val wholeText = strings.joinToString(" ")
         val mapOfBraketsWithText = countOfBrackets(wholeText, file, '{' to '}', 0)
         val block = TextWithBracketBlocks.createBlock(mapOfBraketsWithText.second, mapOfBraketsWithText.first, 0, '{' to '}')
-        println(block.createLexemBlocks('{' to '}', ';', file).joinToString { "${it.text} #${it.blocks.joinToString { it.text }}*" })
         return block.createLexemBlocks('{' to '}', ';', file)
     }
 
@@ -62,7 +61,7 @@ class FileTDL(val file: File) {
             val commentLineInd = s.indexOf("//")
             if (commentLineInd == -1 && commentTextInd == -1) {
                 if (strings[i].matches(Regex("""(.*[^$CHAR_FOR_STRINGS])?"$CHAR_FOR_STRINGS*"""))) {
-                    firstErrors.add(Errors.Error(i + 1, strings[i].length, "unclosed string literal"))
+                    firstErrors.add(Errors.Error(i + 1, strings[i].length, unclosedStringLiteral))
                 }
                 i++
                 continue
@@ -75,7 +74,7 @@ class FileTDL(val file: File) {
                         sb1[j] = ' '
                     strings[i] = s.substring(0, commentTextInd) + sb1.toString() + s.substring(closeInd1, s.length)
                     if (strings[i].matches(Regex("""(.*[^$CHAR_FOR_STRINGS])?"$CHAR_FOR_STRINGS*"""))) {
-                        firstErrors.add(Errors.Error(i + 1, strings[i].length, "closing \" expected"))
+                        firstErrors.add(Errors.Error(i + 1, strings[i].length, closingSignExpected1))
                     }
                 } else {
                     strings[i] = s.substring(0, commentTextInd)
@@ -85,7 +84,7 @@ class FileTDL(val file: File) {
                         i++
                     }
                     if (i == size) {
-                        firstErrors.add(Errors.Error(i + 1, strings.last().length, "non-closed comment"))
+                        firstErrors.add(Errors.Error(i + 1, strings.last().length, nonClosedComment))
                         return strings
                     }
                     val closeInd2 = strings[i].indexOf("*/") + 2
@@ -98,7 +97,7 @@ class FileTDL(val file: File) {
             } else {
                 strings[i] = s.substring(0, commentLineInd)
                 if (strings[i].matches(Regex("""(.*[^$CHAR_FOR_STRINGS])?"$CHAR_FOR_STRINGS*"""))) {
-                    firstErrors.add(Errors.Error(i + 1, strings[i].length, "unclosed string literal"))
+                    firstErrors.add(Errors.Error(i + 1, strings[i].length, unclosedStringLiteral))
                 }
             }
         }

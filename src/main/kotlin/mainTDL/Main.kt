@@ -3,7 +3,7 @@ package mainTDL
 import classesTDL2.*
 import java.io.File
 
-fun countOfBrackets(string: String, file: File?, bracket: Pair<Char, Char>, startIndex: Int): Pair<Map<Int, Int>, String> {
+fun countOfBrackets(string: String, file: File, bracket: Pair<Char, Char>, startIndex: Int): Pair<Map<Int, Int>, String> {
     val sb = StringBuilder(string)
     val res = mutableMapOf<Int, Int>()
     val listOfIndex = mutableListOf<Int>()
@@ -12,9 +12,8 @@ fun countOfBrackets(string: String, file: File?, bracket: Pair<Char, Char>, star
             bracket.first -> listOfIndex.add(i + startIndex)
             bracket.second -> {
                 if (listOfIndex.isEmpty()) {
-                    if (file != null)
-                        mapOfErrors[file]!!.addError(i + startIndex, "No pair for closing bracket")
-                    sb.replace(i, i + 1, " ")
+                    mapOfErrors[file.absolutePath]!!.addError(i + startIndex, noPairForClosingBracket)
+                    sb[i] = ' '
                 }
                 else {
                     res[listOfIndex.last()] = i + startIndex
@@ -25,18 +24,24 @@ fun countOfBrackets(string: String, file: File?, bracket: Pair<Char, Char>, star
     }
     if (listOfIndex.isNotEmpty())
         for (i in listOfIndex) {
-            if (file != null)
-                mapOfErrors[file]!!.addError(i, "No pair for opening bracket")
+            mapOfErrors[file.absolutePath]!!.addError(i, noPairForOpeningBracket)
             sb.append("}")
         }
     return res to sb.toString()
 }
 
 fun main(args: Array<String>) {
-    val file = File("src/main/resources/examples/triangle.tdl")
-    val parser = FilesParser()
-    val list = parser.readingFiles(file)
-    for (str in list) {
+    val list1 = FilesParser.readingFiles("src/main/resources/examples/point.tdl", "src/main/resources/examples/triangle.tdl")
+    val list2 = FilesParser.readDir("src")
+    for (str in list1) {
+        println(str)
+    }
+    println()
+    println()
+    println("New analyse")
+    println()
+    println()
+    for (str in list2) {
         println(str)
     }
 }

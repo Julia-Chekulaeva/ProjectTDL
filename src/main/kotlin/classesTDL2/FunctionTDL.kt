@@ -2,13 +2,18 @@ package classesTDL2
 
 import java.io.File
 
-class FunctionTDL(val name: String, val args: MutableMap<String, Pair<Boolean, TypeTDL?>>, val body: List<LexemBlock>) {
+class FunctionTDL(val name: String, val args: MutableMap<String, Pair<Boolean, TypeTDL?>>, private val body: List<LexemBlock>) {
 
     var used = false
 
     val localVars = mutableMapOf<String, VariableTDL>()
 
     fun analysingFun(file: File, programNames: ProgramNames, invokeType: TypeTDL?) {
+        if (body.isEmpty()) {
+            for (name in args.keys)
+                args[name] = true to null
+            return
+        }
         val bodyWithoutSpaces = body.filter { it.text.trim() != "" }
         val errorVars = mutableListOf<String>()
         if (invokeType != null) {

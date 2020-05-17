@@ -39,7 +39,6 @@ class TextWithBracketBlocks(
                 finalText = finalText.substring(0, openIndex) + finalText.substring(j, finalText.length)
                 j = openIndex + 1
             }
-            println(finalText)
             return TextWithBracketBlocks(finalText, listOfBlocks, indicesOfThisBlock, startIndex, text)
         }
     }
@@ -121,7 +120,7 @@ class TextWithBracketBlocks(
             res.add(LexemBlock(textBlocks[i], lexemBlocks, blockIndices[i] + 1))
         }
         if (res.last().text.trim() != "")
-            mapOfErrors[file]!!.addError(startIndex + mainText.dropLastWhile { it == ' ' }.length, "closing ';' expected")
+            mapOfErrors[file.absolutePath]!!.addError(startIndex + mainText.dropLastWhile { it == ' ' }.length, closingSignExpected2)
         return res.toList()
     }
 }

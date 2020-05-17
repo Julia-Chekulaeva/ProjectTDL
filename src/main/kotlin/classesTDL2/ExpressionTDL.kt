@@ -50,7 +50,7 @@ data class ExpressionTDL(val str: String, val file: File, val index: Int) {
                     programNames.allVars[varName]!!.used = true
                     type = programNames.allVars[varName]!!.type
                 } else {
-                    mapOfErrors[file]!!.addError(variable!!.second, "unresolved")
+                    mapOfErrors[file.absolutePath]!!.addError(variable!!.second, unresolved)
                     variable = null
                 }
             }
@@ -64,7 +64,7 @@ data class ExpressionTDL(val str: String, val file: File, val index: Int) {
                         varsWithInvoke.add(nameAndCountOfArgs.first to nameWithBrackets!!.second)
                     typeTDL != null -> {
                         if (typeTDL.fields.size != nameAndCountOfArgs.second) {
-                            mapOfErrors[file]!!.addError(nameWithBrackets!!.second, "unmatching arguments")
+                            mapOfErrors[file.absolutePath]!!.addError(nameWithBrackets!!.second, unmatchingArguments)
                         } else {
                             programNames.allTypes[nameAndCountOfArgs.first]!!.used = true
                             type = typeTDL
@@ -72,8 +72,8 @@ data class ExpressionTDL(val str: String, val file: File, val index: Int) {
                     }
                     programNames.allFunctions.map { it.key.first to it.value }.
                     toMap()[nameAndCountOfArgs.first] != null ->
-                        mapOfErrors[file]!!.addError(nameWithBrackets!!.second, "unmatching arguments")
-                    else -> mapOfErrors[file]!!.addError(nameWithBrackets!!.second, "unresolved")
+                        mapOfErrors[file.absolutePath]!!.addError(nameWithBrackets!!.second, unmatchingArguments)
+                    else -> mapOfErrors[file.absolutePath]!!.addError(nameWithBrackets!!.second, unresolved)
                 }
             }
             typeName != null -> {
@@ -82,8 +82,9 @@ data class ExpressionTDL(val str: String, val file: File, val index: Int) {
                     programNames.allTypes[typeName]!!.used = true
                     type = programNames.allTypes[typeName]!!
                 } else
-                    mapOfErrors[file]!!.addError(index + str.indexOf(typeName, str.indexOf(" as ") + 3), "unresolved")
-
+                    mapOfErrors[file.absolutePath]!!.addError(
+                            index + str.indexOf(typeName, str.indexOf(" as ") + 3), unresolved
+                    )
             }
         }
         if (type == null && expressionsTDL.size == 1 && field == null)
@@ -94,7 +95,7 @@ data class ExpressionTDL(val str: String, val file: File, val index: Int) {
             else if (type != null && type!!.fields.contains(field))
                 programNames.allTypes[type!!.name]!!.fields[field!!] = true
             else
-                mapOfErrors[file]!!.addError(index + str.indexOf(field!!, str.indexOf(".")), "unresolved")
+                mapOfErrors[file.absolutePath]!!.addError(index + str.indexOf(field!!, str.indexOf(".")), unresolved)
         }
         return varsWithFields to varsWithInvoke
     }
@@ -170,7 +171,7 @@ data class ExpressionTDL(val str: String, val file: File, val index: Int) {
             nameWithBrackets = name to argsBlocks.size to text.indexOf(name) + index
             return
         }
-        mapOfErrors[file]!!.addError(index + str.indexOf(str.trim()), "unrecognised expression")
+        mapOfErrors[file.absolutePath]!!.addError(index + str.indexOf(str.trim()), unrecognisedExpression)
     }
 
     override fun equals(other: Any?): Boolean {

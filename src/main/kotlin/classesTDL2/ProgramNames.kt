@@ -54,7 +54,7 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
         val unusedTypes = types.filter { !it.value.used && it.key != "String" && it.key != "Integer" }.map { it1 ->
             it1.key to it1.value.fields.map { it.key }
         }
-        val typesWithUnusedFields = types.filter { it.value.used && it.key != "String" && it.key != "Int" }.map { it1 ->
+        val typesWithUnusedFields = types.filter { it.key != "String" && it.key != "Int" }.map { it1 ->
             it1.key to it1.value.fields.filter { !it.value }.map { it.key }
         }
         val unusedFuns = functions.filter { !it.value.used && it.key != "main" to 0 }.map { it1 ->
@@ -161,6 +161,28 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
         }
     }
 
+    fun usedImports(programNames: ProgramNames): ProgramNames {
+        for ((name, type) in imports.importedTypes) {
+            if (programNames.types[name] != null) {
+                if (type.used)
+                    programNames.types[name]!!.used = true
+                for ((field, used) in type.fields)
+                    if (used)
+                        programNames.types[name]!!.fields[field] = true
+            }
+        }
+        for ((name, function) in imports.importedFunctions)
+            if (programNames.functions[name] != null) {
+                if (function.used)
+                    programNames.functions[name]!!.used = true
+            }
+        for ((name, variable) in imports.importedVars)
+            if (programNames.vars[name] != null)
+                if (variable.used)
+                    programNames.vars[name]!!.used = true
+        return programNames
+    }
+
     fun invokesOn() {
         for (invoke in invokes) {
             val name = invoke.first
@@ -185,21 +207,21 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
                     if (type != null && type.fields.contains(fieldWithIndex.first))
                         allTypes[type.name]!!.fields[fieldWithIndex.first] = true
                     else
-                        mapOfErrors[file]!!.addError(fieldWithIndex.second, "unresolved")
+                        mapOfErrors[file.absolutePath]!!.addError(fieldWithIndex.second, unresolved)
                 }
                 arg != null -> {
                     val type = arg.second
                     if (type != null && type.fields.contains(fieldWithIndex.first))
                         allTypes[type.name]!!.fields[fieldWithIndex.first] = true
                     else
-                        mapOfErrors[file]!!.addError(fieldWithIndex.second, "unresolved")
+                        mapOfErrors[file.absolutePath]!!.addError(fieldWithIndex.second, unresolved)
                 }
                 globalVar != null -> {
                     val type = globalVar.type
                     if (type != null && type.fields.contains(fieldWithIndex.first))
                         allTypes[type.name]!!.fields[fieldWithIndex.first] = true
                     else
-                        mapOfErrors[file]!!.addError(fieldWithIndex.second, "unresolved")
+                        mapOfErrors[file.absolutePath]!!.addError(fieldWithIndex.second, unresolved)
                 }
             }
         }
@@ -224,8 +246,8 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
                     allTypes[globalVar.type!!.name]!!.usedInvoke = true
                 }
                 typeTDL ?: function != null ->
-                    mapOfErrors[file]!!.addError(varNameAndIndex.second, "unmatching arguments")
-                else -> mapOfErrors[file]!!.addError(varNameAndIndex.second, "unresolved")
+                    mapOfErrors[file.absolutePath]!!.addError(varNameAndIndex.second, unmatchingArguments)
+                else -> mapOfErrors[file.absolutePath]!!.addError(varNameAndIndex.second, unresolved)
             }
         }
     }
@@ -241,13 +263,13 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
         for (variable in vars.values) {
             var similaryTypedVariable: VariableTDL? = variable
             val problemVars = mutableListOf<String>()
-            while (similaryTypedVariable != null && similaryTypedVariable.otherVar() != null && similaryTypedVariable.type == null) {
+            while (similaryTypedVariable?.otherVar() != null && similaryTypedVariable!!.type == null) {
                 problemVars.add(similaryTypedVariable.name)
                 similaryTypedVariable = vars[similaryTypedVariable.otherVar()!!.first]
             }
             similaryTypedVariable = if (problemVars.size == 0) null
             else imports.importedVars[problemVars.last()]
-            while (similaryTypedVariable != null && similaryTypedVariable.otherVar() != null && similaryTypedVariable.type == null) {
+            while (similaryTypedVariable?.otherVar() != null && similaryTypedVariable!!.type == null) {
                 similaryTypedVariable = imports.importedVars[similaryTypedVariable.otherVar()!!.first]
             }
             val type = similaryTypedVariable?.type

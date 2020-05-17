@@ -2,7 +2,39 @@ package classesTDL2
 
 import java.io.File
 
-val mapOfErrors = mutableMapOf<File, Errors>()
+val mapOfErrors = mutableMapOf<String, Errors>()
+
+const val unresolved = "unresolved"
+
+const val unmatchingArguments = "unmatching arguments"
+
+const val ambiguity = "ambiguity"
+
+const val emptyType = "empty type"
+
+const val unrecognisedExpression = "unrecognised expression"
+
+const val unrecognisedStringBlock = "unrecognised string block"
+
+const val unclosedStringLiteral = "unclosedStringLiteral"
+
+const val closingSignExpected1 = "closing \" expected"
+
+const val closingSignExpected2 = "closing ';' expected"
+
+const val nonClosedComment = "non-closed comment"
+
+const val noPairForClosingBracket = "No pair for closing bracket"
+
+const val noPairForOpeningBracket = "No pair for opening bracket"
+
+const val variableTypeCannotBeReassigned = "variable type cannot be reassigned"
+
+const val nameShouldStartWithLetter = "name should start with letter"
+
+const val variableDeclarationNotAllowedHere = "variable declaration not allowed here"
+
+const val invokeMustHaveABody = "invoke must have a body"
 
 val keyWords = listOf<String>()
 

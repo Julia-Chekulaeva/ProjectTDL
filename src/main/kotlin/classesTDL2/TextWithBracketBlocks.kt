@@ -120,7 +120,7 @@ class TextWithBracketBlocks(
             res.add(LexemBlock(textBlocks[i], lexemBlocks, blockIndices[i] + 1))
         }
         if (res.last().text.trim() != "")
-            mapOfErrors[file.absolutePath]!!.addError(startIndex + mainText.dropLastWhile { it == ' ' }.length, closingSignExpected2)
+            mapOfErrors[file.path]!!.addError(startIndex + mainText.dropLastWhile { it == ' ' }.length, closingSignExpected2)
         return res.toList()
     }
 }

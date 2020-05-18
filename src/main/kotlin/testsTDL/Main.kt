@@ -12,7 +12,7 @@ fun countOfBrackets(string: String, file: File, bracket: Pair<Char, Char>, start
             bracket.first -> listOfIndex.add(i + startIndex)
             bracket.second -> {
                 if (listOfIndex.isEmpty()) {
-                    mapOfErrors[file.absolutePath]!!.addError(i + startIndex, noPairForClosingBracket)
+                    mapOfErrors[file.path]!!.addError(i + startIndex, noPairForClosingBracket)
                     sb[i] = ' '
                 }
                 else {
@@ -24,7 +24,7 @@ fun countOfBrackets(string: String, file: File, bracket: Pair<Char, Char>, start
     }
     if (listOfIndex.isNotEmpty())
         for (i in listOfIndex) {
-            mapOfErrors[file.absolutePath]!!.addError(i, noPairForOpeningBracket)
+            mapOfErrors[file.path]!!.addError(i, noPairForOpeningBracket)
             sb.append("}")
         }
     return res to sb.toString()

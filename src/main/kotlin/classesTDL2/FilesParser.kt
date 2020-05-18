@@ -56,7 +56,7 @@ class FilesParser {
         fileTDL.createErrors()
         val programNames = ProgramNames(fileTDL.readFile(), file)
         programNames.analysingFile()
-        mapOfFilesNamesAndProgramNames[file.absolutePath] = programNames
+        mapOfFilesNamesAndProgramNames[file.path] = programNames
         return programNames
     }
 
@@ -66,14 +66,14 @@ class FilesParser {
             val programNames = creatingProgramNames(file)
             listOfProgramNames.add(programNames)
             for (importedFile in programNames.importedFiles) {
-                mapOfFilesNamesAndProgramNames[importedFile.absolutePath] = creatingProgramNames(importedFile)
+                mapOfFilesNamesAndProgramNames[importedFile.path] = creatingProgramNames(importedFile)
             }
         }
         for (i in 0 until listOfProgramNames.size) {
-            val filesToAdd = listOfProgramNames[i].importedFiles.map { mapOfFilesNamesAndProgramNames[it.absolutePath]!! }
+            val filesToAdd = listOfProgramNames[i].importedFiles.map { mapOfFilesNamesAndProgramNames[it.path]!! }
             listOfProgramNames[i].addingOtherProgramNames(filesToAdd)
         }
-        for (fileName in list.map { it.absolutePath }) {
+        for (fileName in list.map { it.path }) {
             mapOfFilesNamesAndProgramNames[fileName]!!.addImportsToThis()
             mapOfFilesNamesAndProgramNames[fileName]!!.invokesOn()
             mapOfFilesNamesAndProgramNames[fileName]!!.analysingVars()
@@ -81,20 +81,20 @@ class FilesParser {
             mapOfFilesNamesAndProgramNames[fileName]!!.separatingImportsFromThis()
         }
         for (file in list) {
-            val programNames = mapOfFilesNamesAndProgramNames[file.absolutePath]!!
+            val programNames = mapOfFilesNamesAndProgramNames[file.path]!!
             for (importedFile in programNames.importedFiles) {
-                mapOfFilesNamesAndProgramNames[importedFile.absolutePath] =
-                        mapOfFilesNamesAndProgramNames[file.absolutePath]!!.
-                        usedImports(mapOfFilesNamesAndProgramNames[importedFile.absolutePath]!!)
+                mapOfFilesNamesAndProgramNames[importedFile.path] =
+                        mapOfFilesNamesAndProgramNames[file.path]!!.
+                        usedImports(mapOfFilesNamesAndProgramNames[importedFile.path]!!)
             }
         }
         for (file in list) {
-            val programNames = mapOfFilesNamesAndProgramNames[file.absolutePath]!!
-            res.add("File ${file.absolutePath}")
+            val programNames = mapOfFilesNamesAndProgramNames[file.path]!!
+            res.add("File ${file.path}")
             res.add("Imported files:")
-            res.addAll(programNames.importedFiles.map { "\t${it.absolutePath}" })
+            res.addAll(programNames.importedFiles.map { "\t${it.path}" })
             res.addAll(programNames.getAllNames())
-            res.addAll(mapOfErrors[file.absolutePath]!!.getErrorsMessages())
+            res.addAll(mapOfErrors[file.path]!!.getErrorsMessages())
             res.addAll(programNames.getUnused())
         }
         return res

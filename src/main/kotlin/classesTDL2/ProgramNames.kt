@@ -207,21 +207,21 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
                     if (type != null && type.fields.contains(fieldWithIndex.first))
                         allTypes[type.name]!!.fields[fieldWithIndex.first] = true
                     else
-                        mapOfErrors[file.absolutePath]!!.addError(fieldWithIndex.second, unresolved)
+                        mapOfErrors[file.path]!!.addError(fieldWithIndex.second, unresolved)
                 }
                 arg != null -> {
                     val type = arg.second
                     if (type != null && type.fields.contains(fieldWithIndex.first))
                         allTypes[type.name]!!.fields[fieldWithIndex.first] = true
                     else
-                        mapOfErrors[file.absolutePath]!!.addError(fieldWithIndex.second, unresolved)
+                        mapOfErrors[file.path]!!.addError(fieldWithIndex.second, unresolved)
                 }
                 globalVar != null -> {
                     val type = globalVar.type
                     if (type != null && type.fields.contains(fieldWithIndex.first))
                         allTypes[type.name]!!.fields[fieldWithIndex.first] = true
                     else
-                        mapOfErrors[file.absolutePath]!!.addError(fieldWithIndex.second, unresolved)
+                        mapOfErrors[file.path]!!.addError(fieldWithIndex.second, unresolved)
                 }
             }
         }
@@ -246,8 +246,8 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
                     allTypes[globalVar.type!!.name]!!.usedInvoke = true
                 }
                 typeTDL ?: function != null ->
-                    mapOfErrors[file.absolutePath]!!.addError(varNameAndIndex.second, unmatchingArguments)
-                else -> mapOfErrors[file.absolutePath]!!.addError(varNameAndIndex.second, unresolved)
+                    mapOfErrors[file.path]!!.addError(varNameAndIndex.second, unmatchingArguments)
+                else -> mapOfErrors[file.path]!!.addError(varNameAndIndex.second, unresolved)
             }
         }
     }

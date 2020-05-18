@@ -1,5 +1,5 @@
 Analysing files
-File C:\Users\Юлия\IdeaProjects\ProjectTDL\src\test\resources\examples\point.tdl
+File src\test\resources\examples\point.tdl
 Imported files:
 Types: Point(x, y)
 Functions: sqr(x), sqrt(x), distance(p1, p2), print(s), foo(p, s)
@@ -39,7 +39,7 @@ Unused
 	invokes local variables:
 		Point:
 	global variables:
-File C:\Users\Юлия\IdeaProjects\ProjectTDL\src\test\resources\examples\point2.tdl
+File src\test\resources\examples\point2.tdl
 Imported files:
 Types: Point(x, y)
 Functions: sqr(x), sqrt(x), distance(p1, p2), print(s), foo(p, s)

@@ -15,8 +15,8 @@ class FileTDL(val file: File) {
         val listOfSeparatingIndices = mutableListOf(-1)
         for (string in strings)
             listOfSeparatingIndices.add(string.length + listOfSeparatingIndices.last() + 1)
-        mapOfErrors[file.absolutePath] = Errors(listOfSeparatingIndices)
-        mapOfErrors[file.absolutePath]!!.addErrors(firstErrors)
+        mapOfErrors[file.path] = Errors(listOfSeparatingIndices)
+        mapOfErrors[file.path]!!.addErrors(firstErrors)
     }
 
     private fun replaceStringConstants(strings: List<String>): List<String> {

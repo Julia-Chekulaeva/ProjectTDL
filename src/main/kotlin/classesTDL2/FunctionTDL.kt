@@ -2,7 +2,7 @@ package classesTDL2
 
 import java.io.File
 
-class FunctionTDL(val name: String, val args: MutableMap<String, Pair<Boolean, TypeTDL?>>, private val body: List<LexemBlock>) {
+class FunctionTDL(val name: String, val args: MutableMap<String, Pair<Boolean, TypeTDL?>>, private val body: List<CommandBlock>) {
 
     var used = false
 

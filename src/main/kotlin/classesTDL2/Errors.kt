@@ -1,10 +1,12 @@
 package classesTDL2
 
-import java.io.File
-
 val mapOfErrors = mutableMapOf<String, Errors>()
 
+const val importsAllowedOnlyAtTheTopOfTheFile = "imports allowed only at the top of the file"
+
 const val unresolved = "unresolved"
+
+const val someArgumentExpected = "some argument expected"
 
 const val unmatchingArguments = "unmatching arguments"
 

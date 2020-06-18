@@ -1,19 +1,13 @@
 package classesTDL2
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import java.io.File
 
-class LexemBlock(val text: String, val lexems: List<Lexem>, val blocks: List<LexemBlock>, val startIndex: Int) {
+class CommandBlock(val text: String, val blocks: List<CommandBlock>, val startIndex: Int) {
 
     fun analysingImports(file: File, programNames: ProgramNames): Boolean {
-        if (lexems.size > 1 && "${lexems[0].text} ${lexems[1].text}" == "import file") {
-            if (lexems.size < 3) {
-                mapOfErrors[file.path]!!.addError(
-                        lexems.last().startIndex + lexems.last().text.length, someArgumentExpected
-                )
-                return true
-            }
-            val name = lexems.subList(2, lexems.size).joinToString("") { it.text }.replace(".", File.separator)
+        val textWithoutSpaces = text.filter { it != ' ' }
+        if (text.matches(""" *import +file +[\w.\d]+ *""".toRegex())) {
+            val name = textWithoutSpaces.removePrefix("importfile").replace(".", File.separator)
             var fileName = "$name.tdl"
             var directory = file.parentFile
             if (!File(fileName).exists()) {
@@ -32,22 +26,18 @@ class LexemBlock(val text: String, val lexems: List<Lexem>, val blocks: List<Lex
                 programNames.addFile(fileToImport)
                 return true
             }
-            mapOfErrors[file.path]!!.addError(lexems[2].startIndex, unresolved)
+            mapOfErrors[file.path]!!.addError(text.indexOf(fileName,
+                    text.indexOf(" file ") + 5) + startIndex, unresolved)
             return true
         }
         return false
     }
-}
-/*
+
     fun analyseTopLevelLexem(file: File, programNames: ProgramNames) {
-        if (lexems.size > 1 && "${lexems[0].text} ${lexems[1].text}" == "import file") {
-            mapOfErrors[file.path]!!.addError(lexems[0].startIndex, importsAllowedOnlyAtTheTopOfTheFile)
-            return
-        }
-        if (lexems.isNotEmpty() && lexems[0].text == "type") {
-            //text.matches(""" *type +[\w\d]+ *\(( *[\w\d]+( *, *[\w\d]+)*)? *\) *""".toRegex())) {
+        val textWithoutSpaces = text.filter { it != ' ' }
+        if (text.matches(""" *type +[\w\d]+ *\(( *[\w\d]+( *, *[\w\d]+)*)? *\) *""".toRegex())) {
             val split = textWithoutSpaces.removePrefix("type").removeSuffix(")").split("(")
-            val name =
+            val name = split[0]
             if (name[0] in '0'..'9') {
                 mapOfErrors[file.path]!!.addError(startIndex + text.indexOf(name), nameShouldStartWithLetter)
                 return
@@ -228,4 +218,4 @@ class LexemBlock(val text: String, val lexems: List<Lexem>, val blocks: List<Lex
         programNames.analysingFieldsAndInvokes(pair.first, pair.second, localVars, args)
         return
     }
-}*/
+}

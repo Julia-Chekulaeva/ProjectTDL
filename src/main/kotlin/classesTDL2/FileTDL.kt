@@ -45,6 +45,13 @@ class FileTDL(val file: File) {
         return res
     }
 
+    fun readFileWrongVersion(): List<CommandBlock> {
+        val wholeText = strings.joinToString(" ")
+        val mapOfBraketsWithText = countOfBrackets(wholeText, file, '{' to '}', 0)
+        val block = TextWithBracketBlocks.createBlock(mapOfBraketsWithText.second, mapOfBraketsWithText.first, 0, '{' to '}')
+        return block.createCommandBlocks('{' to '}', ';', file)
+    }
+
     fun readFile(): List<LexemBlock> {
         val wholeText = strings.joinToString(" ")
         val mapOfBraketsWithText = countOfBrackets(wholeText, file, '{' to '}', 0)

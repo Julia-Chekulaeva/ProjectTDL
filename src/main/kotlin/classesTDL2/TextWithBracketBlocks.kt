@@ -105,6 +105,27 @@ class TextWithBracketBlocks(
         return res.toList()
     }
 
+    fun createCommandBlocks(brackets: Pair<Char, Char>, separatorChar: Char, file: File): List<CommandBlock> {
+        val bracketsTogether = "${brackets.first}${brackets.second}"
+        val textBlocks = mainText.split(separatorChar)
+        val res = mutableListOf<CommandBlock>()
+        val blockIndices = findSeparatorIndices(brackets.first, separatorChar)
+        var indexOfBlock = 0
+        for (i in textBlocks.indices) {
+            val lexemBlocks = if (textBlocks[i].split(bracketsTogether).size != 2)
+                listOf()
+            else
+                blocks[indexOfBlock].createCommandBlocks(brackets, separatorChar, file)
+            indexOfBlock += textBlocks[i].split(bracketsTogether).lastIndex
+            res.add(CommandBlock(textBlocks[i], lexemBlocks, blockIndices[i] + 1))
+        }
+        if (res.last().text.trim() != "")
+            mapOfErrors[file.path]!!.addError(startIndex + mainText.dropLastWhile { it == ' ' }.length, closingSignExpected2)
+        return res.toList()
+    }
+
+    // New code
+
     fun createLexemBlocks(brackets: Pair<Char, Char>, separatorChar: Char, file: File): List<LexemBlock> {
         val bracketsTogether = "${brackets.first}${brackets.second}"
         val textBlocks = mainText.split(separatorChar)
@@ -112,14 +133,14 @@ class TextWithBracketBlocks(
         val blockIndices = findSeparatorIndices(brackets.first, separatorChar)
         var indexOfBlock = 0
         for (i in textBlocks.indices) {
-            val lexemBlocks = if (textBlocks[i].split(bracketsTogether).size != 2)
-                listOf()
-            else
+            val lexemBlocks =
                 blocks[indexOfBlock].createLexemBlocks(brackets, separatorChar, file)
             indexOfBlock += textBlocks[i].split(bracketsTogether).lastIndex
-            res.add(LexemBlock(textBlocks[i], lexemBlocks, blockIndices[i] + 1))
+            res.add(LexemBlock(textBlocks[i], Lexem.createLexems(
+                    textBlocks[i], blockIndices[i] + 1), lexemBlocks, blockIndices[i])
+            )
         }
-        if (res.last().text.trim() != "")
+        if (res.last().lexems.isNotEmpty())
             mapOfErrors[file.path]!!.addError(startIndex + mainText.dropLastWhile { it == ' ' }.length, closingSignExpected2)
         return res.toList()
     }

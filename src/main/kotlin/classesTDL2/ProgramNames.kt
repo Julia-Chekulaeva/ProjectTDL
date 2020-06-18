@@ -2,7 +2,9 @@ package classesTDL2
 
 import java.io.File
 
-class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
+class ProgramNames(private val blocks: List<CommandBlock>, val file: File) {
+
+    // Here is the beginning of the old functions
 
     class Imports {
         val importedFunctions = mutableMapOf<Pair<String, Int>, FunctionTDL>()
@@ -36,7 +38,7 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
 
     val functions = mutableMapOf<Pair<String, Int>, FunctionTDL>()
 
-    val invokes = mutableListOf<Triple<String, List<LexemBlock>, Int>>()
+    val invokes = mutableListOf<Triple<String, List<CommandBlock>, Int>>()
 
     val vars = mutableMapOf<String, VariableTDL>()
 
@@ -290,7 +292,7 @@ class ProgramNames(private val blocks: List<LexemBlock>, val file: File) {
         vars[name] = VariableTDL(name, exp)
     }
 
-    fun addFunction(name: String, argsList: List<String>, body: List<LexemBlock>) {
+    fun addFunction(name: String, argsList: List<String>, body: List<CommandBlock>) {
         val args = mutableMapOf<String, Pair<Boolean, TypeTDL?>>()
         for (argName in argsList)
             args[argName] = false to null

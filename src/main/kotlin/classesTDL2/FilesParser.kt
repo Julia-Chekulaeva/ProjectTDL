@@ -54,7 +54,7 @@ class FilesParser {
     private fun creatingProgramNames(file: File): ProgramNames {
         val fileTDL = FileTDL(file)
         fileTDL.createErrors()
-        val programNames = ProgramNames(fileTDL.readFile(), file)
+        val programNames = ProgramNames(fileTDL.readFileWrongVersion(), file)
         programNames.analysingFile()
         mapOfFilesNamesAndProgramNames[file.path] = programNames
         return programNames

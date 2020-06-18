@@ -12,7 +12,7 @@ class TypeTDL(val name: String, val fields: MutableMap<String, Boolean>) {
 
     var localFunInvoke: FunctionTDL? = null
 
-    val invokeBody: MutableList<LexemBlock> = mutableListOf()
+    val invokeBody: MutableList<CommandBlock> = mutableListOf()
 
     fun runInvoke(file: File, programNames: ProgramNames) {
         val args = mutableMapOf<String, Pair<Boolean, TypeTDL?>>()

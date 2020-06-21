@@ -1,0 +1,39 @@
+Analysing files
+File src\test\resources\examples\pointComments.tdl
+Imported files:
+Types: Point(x, y)
+Functions: sqr(x), sqrt(x), print(s), foo(p, s)
+Variables: max, o
+Invokes on: Point
+Errors found: 3
+	Error in string 8 char 1: unrecognised string block
+	Error in string 23 char 14: unresolved
+	Error in string 29 char 13: unmatching arguments
+Unused
+	types:
+	type fields:
+		Integer:
+		Point:
+	functions:
+		sqr(x)
+		foo(p, s)
+	invokes:
+	functions arguments and local variables:
+		sqr:
+			arguments:
+			local variables:
+		sqrt:
+			arguments:
+			local variables:
+		print:
+			arguments:
+			local variables:
+		foo:
+			arguments:
+			local variables:
+				ss
+				absErr
+				ppErr
+	invokes local variables:
+		Point:
+	global variables:

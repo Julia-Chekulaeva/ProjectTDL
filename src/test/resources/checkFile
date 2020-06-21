@@ -1,6 +1,6 @@
 Files with tdl-format found: 4
 Analysing files
-File src\test\resources\examples\point.tdl
+File src\test\resources\dir\point.tdl
 Imported files:
 Types: Point(x, y)
 Functions: sqr(x), sqrt(x), distance(p1, p2), print(s), foo(p, s)
@@ -38,7 +38,7 @@ Unused
 	invokes local variables:
 		Point:
 	global variables:
-File src\test\resources\examples\point2.tdl
+File src\test\resources\dir\point2.tdl
 Imported files:
 Types: Point(x, y)
 Functions: sqr(x), sqrt(x), distance(p1, p2), print(s), foo(p, s)
@@ -78,9 +78,9 @@ Unused
 	invokes local variables:
 		Point:
 	global variables:
-File src\test\resources\examples\triangle.tdl
+File src\test\resources\dir\triangle.tdl
 Imported files:
-	src\test\resources\examples\point.tdl
+	src\test\resources\dir\point.tdl
 Types: Triangle(p1, p2, p3)
 Functions: perimeter(t), triangle(), bar(triangle), main()
 Variables:
@@ -112,9 +112,9 @@ Unused
 	invokes local variables:
 		Triangle:
 	global variables:
-File src\test\resources\examples\triangle2.tdl
+File src\test\resources\dir\triangle2.tdl
 Imported files:
-	src\test\resources\examples\point.tdl
+	src\test\resources\dir\point.tdl
 Types: Triangle(p1, p2, p3)
 Functions: perimeter(t, l), triangle(), bar(triangle), main()
 Variables:

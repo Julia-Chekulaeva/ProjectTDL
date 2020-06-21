@@ -1,6 +1,6 @@
-package testsTDL
+package mainPackage
 
-import classesTDL2.*
+import classesTDL.*
 import java.io.File
 
 fun countOfBrackets(string: String, file: File, bracket: Pair<Char, Char>, startIndex: Int): Pair<Map<Int, Int>, String> {
@@ -33,6 +33,7 @@ fun countOfBrackets(string: String, file: File, bracket: Pair<Char, Char>, start
 fun main(args: Array<String>) {
     val list1 = FilesParser.readingFiles("src/main/resources/examples/point.tdl", "src/main/resources/examples/triangle.tdl")
     val list2 = FilesParser.readDir("src")
+    val list3 = FilesParser.readingFiles("src/test/resources/examples/pointComments2.tdl")
     for (str in list1) {
         println(str)
     }
@@ -42,6 +43,14 @@ fun main(args: Array<String>) {
     println()
     println()
     for (str in list2) {
+        println(str)
+    }
+    println()
+    println()
+    println("New analyse 2")
+    println()
+    println()
+    for (str in list3) {
         println(str)
     }
 }
